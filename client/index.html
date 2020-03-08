@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>MyNewGame</title>
+  </head>
+  <body>
+    <section id="auth">
+      <div id="login">
+        <form id="loginForm" action="index.html" method="post">
+          Username: <input type="text" id="usernameInput" value="">
+          <br>
+          Password: <input type="password" id="passwordInput" value="">
+        </form>
+        <br>
+        &nbsp;<span class="switchAuth" id="switchReg">register</span>
+      </div>
+      <div id="register">
+        <form id="regForm" action="index.html" method="post">
+          <input type="text" id="regNameInput" value="" placeholder="Choose a username">
+          <br>
+          <input type="password" id="regPassInput" value="" placeholder="Choose a password">
+          <br>
+          <input type="password" id="regConfirmInput" value="" placeholder="Confirm password">
+        </form>
+        <br>
+        &nbsp;<span class="switchAuth" id="switchLog">login</span>
+      </div>
+    </section>
+    <section id="content">
+      <h1>MyNewGame</h1>
+      <p>Welcome</p>
+      <canvas id="gameWindow" width="533" height="300"></canvas>
+      <div id="chatText"></div>
+      <form id="chatForm" action="index.html" method="post">
+        <input type="text" id="chatInput" value="" placeholder="Type your message here.">
+      </form>
+    </section>
+  </body>
+
+  <foot>
+    <style>
+      #gameWindow{
+        border: 1px solid black;
+      }
+      #chatText{
+        overflow: scroll;
+        height: 300px;
+        width: 533px;
+      }
+      #chatInput{
+        border: 1px solid #99c;
+        border-radius: 10px;
+        width: 533px;
+        height: 30px;
+      }
+      #content{
+        display: none;
+      }
+      #register{
+        display: none;
+      }
+      .switchAuth{
+        font-size: 16pt;
+        color: gray;
+      }
+    </style>
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js" charset="utf-8"></script>
+    <script type="text/javascript">
+      var password = "00000000000000000000000000000000";
+      var charList = "0123456789qwertyuiopasdfghjklzxcvbnm,./;'[]-=<>?:{}|_+`~!@#$%^&*()`".split('');
+      var chars1 = "d?m.:h3nts_vwa|`by<ox,0u%7k#2~cfp'^g$+!-ql[{@94/j>1*(=r;e}i8z]&)56";
+      var chars1 = "k#0:d3,-%[o4@>)f^c/;p`5x+?2sj&r*_.h]{|$bn61~alwm=ve}<9gy7u!(8zt'iq";
+      for(var ea of [1,2,3,4]){
+        for (var i in charList){
+          var j = Math.floor(Math.random()*charList.length);
+          var first = charList[i];
+          charList[i] = charList[j];
+          charList[j] = first;
+        }
+      }
+      alert(chars1.length);
+      //charList = ;
+    </script>
+    <script type="text/javascript">
+      var log = document.querySelector('#switchLog');
+      var reg = document.querySelector('#switchReg');
+      var login = document.querySelector('#login');
+      var register = document.querySelector('#register');
+      var logForm = document.querySelector('#loginForm');
+      var regForm = document.querySelector('#regForm');
+      var un = document.querySelector('#usernameInput');
+      var pw = document.querySelector('#passwordInput');
+      var run = document.querySelector('#regNameInput');
+      var rpw = document.querySelector('#regPasswordInput');
+      var rpw2 = document.querySelector('#regConfirmInput');
+      log.onclick = function(){
+        register.style.display = "none";
+        login.style.display = "block";
+      };
+      reg.onclick = function(){
+        login.style.display = "none";
+        register.style.display = "block";
+      };
+
+      var can = document.querySelector('#gameWindow');
+      var ctx = can.getContext('2d');
+      var chatInput = document.querySelector('#chatInput');
+      var chatForm = document.querySelector('#chatForm');
+      var chatText = document.querySelector('#chatText');
+      ctx.font = '30px Arial';
+
+      var socket = io();
+
+      socket.on('newPositions',function(data){
+        ctx.clearRect(0,0,can.width,can.height);
+        for(var player of data){
+          ctx.fillText(player.number,player.x,player.y);
+        }
+      });
+
+      socket.on('addToChat',function(data){
+        chatText.innerHTML += '<div>'+data+'</div>';
+        chatText.scrollTop = chatText.scrollHeight;
+      });
+
+      chatForm.onsubmit = function(e){
+        e.preventDefault();
+        socket.emit('sendMsgToServer',chatInput.value);
+        chatInput.value = '';
+      };
+
+      logForm.onsubmit = function(e){
+        e.preventDefault();
+        socket.emit('sendLogin',{
+          username: un.value,
+          password: pw.value
+        });
+        pw.value = '';
+      };
+
+      regForm.onsubmit = function(e){
+        e.preventDefault();
+        if(rpw.value == rpw2.value){
+          socket.emit('sendReg',{
+            username: run.value,
+            password: rpw.value
+          });
+          pw.value = '';
+        }
+      };
+    </script>
+  </foot>
+</html>

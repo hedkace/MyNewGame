@@ -1,0 +1,17 @@
+{
+  "name": "mynewgame",
+  "version": "1.0.0",
+  "description": "Just a test.",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "sanitizer": "^0.1.3",
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ryan Sotelo",
+  "license": "ISC"
+}
